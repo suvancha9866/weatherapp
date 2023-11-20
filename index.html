@@ -8,17 +8,19 @@
     <body>
         <div class="card">
             <div class="search">
-                <input type="text" placeholder="Enter City Name" 
+                <input type="text" placeholder="Enter City, State, and Country Name" 
                 spellcheck="false">
                 <button><img src="images/search.png"></button>
             </div>
             <div class="error">
-                <p>Invalid City Name</p>
+                <p>Invalid Place Name</p>
             </div>
             <div class="weather">
-                <img src="images/rain.png" class="weather-icon">
+                <img src="images/clear.png" class="weather-icon">
                 <h1 class="temp">0°F</h1>
                 <h2 class="city">Aurora</h2>
+                <h2 class="state"></h2>
+                <h2 class="country">US</h2>
                 <div class="details">
                     <div class="col">
                         <img src="images/humidity.png">
@@ -35,6 +37,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="details">
+                    <div class="col">
+                        <img src="images/feels-like.png">
+                        <div>
+                            <p class="feels-like">0°F</p>
+                            <p>Feels-Like</p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <p class="high"></p>
+                    </div>
+                    <div class="col">
+                        <p class="low"></p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -44,8 +61,9 @@
             const searchBox = document.querySelector(".search input");
             const searchBtn = document.querySelector(".search button");
             const weatherIcon = document.querySelector(".weather-icon");
-            async function checkWeather(city) {
-                const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+            async function checkWeather(code) {
+                const codeArray = code.split(", ");
+                const response = await fetch(apiUrl + codeArray[0] + "," + codeArray[1] + "," + codeArray[2] + `&appid=${apiKey}`);
                 if(response.status==404){
                     document.querySelector(".error").style.display = "block";
                     document.querySelector(".weather").style.display = "none";
@@ -53,9 +71,15 @@
                     var data = await response.json();
 
                     document.querySelector(".city").innerHTML = data.name;
+                    document.querySelector(".country").innerHTML = data.sys.country;
                     document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°F";
                     document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
                     document.querySelector(".wind").innerHTML = data.wind.speed + "MPH";
+                    document.querySelector(".feels-like").innerHTML = Math.round(data.main.feels_like) + "°F";
+                    document.querySelector(".high").innerHTML = "High: " + Math.round(data.main.temp_max) + "°F";
+                    document.querySelector(".low").innerHTML = "Low: " + Math.round(data.main.temp_min) + "°F";
+
+                    console.log(data);
 
                     if(data.weather[0].main == "Clouds") {
                         weatherIcon.src = "images/clouds.png";
